@@ -1,6 +1,5 @@
 import classes from './Checkout.module.css';
 import useForm from '../../hooks/use-form';
-import useHttp from '../../hooks/use-http';
 
 const Checkout = props => {
   const {
@@ -51,7 +50,13 @@ const Checkout = props => {
     if (!formIsValid) {
       return;
     }
-    console.log(enteredName);
+    const customerDetails = {
+      name: enteredName,
+      street: enteredStreet,
+      postalCode: enteredPostalCode,
+      city: enteredCity,
+    };
+    props.onOrderSubmit(customerDetails);
     resetForm();
   };
 
