@@ -1,31 +1,24 @@
 import { useCallback, useState } from 'react';
 
 const useHttp = () => {
-  const [availableMeals, setAvailableMeals] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [httpError, setHttpError] = useState(null);
 
-  const sendRequest = useCallback(async url => {
+  const sendRequest = useCallback(async (requestConfig, transformData) => {
     setIsLoading(true);
     try {
-      const response = await fetch(url);
+      const response = await fetch(requestConfig.url, {
+        method: requestConfig.method ? requestConfig.method : 'GET',
+        headers: requestConfig.headers ? requestConfig.headers : {},
+        body: requestConfig.body ? JSON.stringify(requestConfig.body) : null,
+      });
       if (!response.ok) {
         throw new Error('Something went wrong...');
       }
 
       const responseData = await response.json();
 
-      let loadedMeals = [];
-
-      for (const key in responseData) {
-        loadedMeals.push({
-          id: key,
-          name: responseData[key].name,
-          price: responseData[key].price,
-          description: responseData[key].description,
-        });
-      }
-      setAvailableMeals(loadedMeals);
+      transformData(responseData);
     } catch (error) {
       setIsLoading(false);
       setHttpError(error.message);
@@ -33,7 +26,6 @@ const useHttp = () => {
     setIsLoading(false);
   }, []);
   return {
-    availableMeals,
     sendRequest,
     isLoading,
     httpError,
