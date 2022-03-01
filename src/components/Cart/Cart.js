@@ -1,11 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styles from './Cart.module.css';
 import Modal from '../UI/Modal';
 import Button from '../UI/Button';
 import CartContext from '../store/cart-context';
 import CartItem from './CartItem';
+import Checkout from './Checkout';
 
 const Cart = props => {
+  const [showCustomerDetailsForm, setShowCustomerDetailsForm] = useState(false);
   const cartCTX = useContext(CartContext);
 
   const totalAmount = cartCTX.totalAmount.toFixed(2);
@@ -17,6 +19,14 @@ const Cart = props => {
 
   const cartItemAddHandler = item => {
     cartCTX.addToCart({ ...item, amount: 1 });
+  };
+
+  const showCustomerDetailsFormHandler = () => {
+    setShowCustomerDetailsForm(true);
+  };
+
+  const cancelOrderHandler = () => {
+    setShowCustomerDetailsForm(false);
   };
 
   const cartItems = (
@@ -40,12 +50,22 @@ const Cart = props => {
         <span>Total Amount</span>
         <span>£{totalAmount}</span>
       </div>
-      <div className={styles.actions}>
-        <Button className={styles['button--alt']} onClick={props.onClose}>
-          Close
-        </Button>
-        {hasItems && <Button className={styles.button}>Order</Button>}
-      </div>
+      {showCustomerDetailsForm && <Checkout onCancel={cancelOrderHandler} />}
+      {!showCustomerDetailsForm && (
+        <div className={styles.actions}>
+          <Button className={styles['button--alt']} onClick={props.onClose}>
+            Close
+          </Button>
+          {hasItems && (
+            <Button
+              className={styles.button}
+              onClick={showCustomerDetailsFormHandler}
+            >
+              Order
+            </Button>
+          )}
+        </div>
+      )}
     </Modal>
   );
 };

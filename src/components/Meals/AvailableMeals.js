@@ -1,37 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './AvailableMeals.module.css';
 import Card from '../UI/Card';
 import MealsItem from './MealsItem';
-
-const DUMMY_MEALS = [
-  {
-    id: 'm1',
-    name: 'Sushi',
-    description: 'Finest fish and veggies',
-    price: 22.99,
-  },
-  {
-    id: 'm2',
-    name: 'Schnitzel',
-    description: 'A german specialty!',
-    price: 16.5,
-  },
-  {
-    id: 'm3',
-    name: 'Barbecue Burger',
-    description: 'American, raw, meaty',
-    price: 12.99,
-  },
-  {
-    id: 'm4',
-    name: 'Green Bowl',
-    description: 'Healthy...and green...',
-    price: 18.99,
-  },
-];
+import useHttp from '../../hooks/use-http';
 
 const AvailableMeals = () => {
-  const availableMeals = DUMMY_MEALS.map(meal => {
+  const {
+    availableMeals: meals,
+    sendRequest,
+    isLoading,
+    httpError,
+  } = useHttp();
+
+  useEffect(() => {
+    sendRequest(
+      'https://react-food-79a63-default-rtdb.europe-west1.firebasedatabase.app/meals.json'
+    );
+  }, [sendRequest]);
+
+  const availableMeals = meals.map(meal => {
     return (
       <MealsItem
         key={meal.id}
@@ -45,6 +32,8 @@ const AvailableMeals = () => {
 
   return (
     <Card className={styles.meals}>
+      {httpError && <p>{httpError}</p>}
+      {isLoading && <p>Loading...</p>}
       <ul>{availableMeals}</ul>
     </Card>
   );
